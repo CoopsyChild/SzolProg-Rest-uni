@@ -5,12 +5,14 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use szolprog\API\DB;
 use szolprog\API\Middleware\TokenAuthMiddleware;
+use szolprog\API\Middleware\AuthLevelMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $app = AppFactory::create();
 $app->setBasePath('/SzolProg-Rest-uni');
 $app->addBodyParsingMiddleware();
+$app->add(new TokenAuthMiddleware('/SzolProg-Rest-uni'));
 
 
 $app->get('/', function (Request $request, Response $response) {
@@ -28,7 +30,7 @@ $app->get('/users', function (Request $request, Response $response) {
     return $response
         ->withHeader('content-type', 'application/json')
         ->withStatus(200);
-});
+})->add(new AuthLevelMiddleware());
 
 $app->post('/users/login', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();

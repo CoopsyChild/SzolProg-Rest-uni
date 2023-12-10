@@ -9,7 +9,7 @@
 | /users          | GET         | Y    | Y     | all users               |
 | /users          | PUT         | Y    |       | edited user             |
 | /drinks         | GET         | Y    | Y     | all drinks              |
-| /drinks/userid  | GET         | Y    | Y     | all user's drinks       |
+| /drinks/userid  | GET         | Y    |       | all user's drinks       |
 | /drinks         | POST        | Y    |       | new drink created       |
 | /drinks         | PUT         | Y    |       | edited drink            |
 | /drinks         | DELETE      | Y    |       | true / false            |
