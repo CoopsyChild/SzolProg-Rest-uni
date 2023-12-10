@@ -13,6 +13,10 @@ class ComposerStaticInit830e4bba56f1ff55787769733d4c2f4c
     );
 
     public static $prefixLengthsPsr4 = array (
+        's' => 
+        array (
+            'szolprog\\API\\' => 13,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
@@ -35,6 +39,10 @@ class ComposerStaticInit830e4bba56f1ff55787769733d4c2f4c
     );
 
     public static $prefixDirsPsr4 = array (
+        'szolprog\\API\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
+        ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
@@ -62,8 +70,8 @@ class ComposerStaticInit830e4bba56f1ff55787769733d4c2f4c
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Container\\' => 
         array (
