@@ -8,8 +8,7 @@
 | /users/register | POST        |      |       | new user created        |
 | /users          | GET         | Y    | Y     | all users               |
 | /users          | PUT         | Y    |       | edited user             |
-| /drinks         | GET         | Y    | Y     | all drinks              |
-| /drinks/userid  | GET         | Y    |       | all user's drinks       |
+| /drinks         | GET         | Y    | Y     | all drinks (for admin)  |
 | /drinks         | POST        | Y    |       | new drink created       |
 | /drinks         | PUT         | Y    |       | edited drink            |
 | /drinks         | DELETE      | Y    |       | true / false            |
