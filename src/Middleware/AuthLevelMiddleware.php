@@ -19,7 +19,14 @@ class AuthLevelMiddleware {
                 return $handler->handle($request->withAttribute('isAdmin','true'));
             }
             else if(!is_null($request->getParsedBody())) {
-                $target_user_id = $request->getParsedBody()['user_id'];
+                if(isset($request->getParsedBody()['product_id'])){
+                    $statement = $pdo->prepare('SELECT owner_id FROM drink_stock WHERE id = ?');
+                    $statement->execute([$request->getParsedBody()['product_id']]);
+                    $target_user_id = $statement->fetch(\PDO::FETCH_ASSOC)['owner_id'];
+                }
+                else{
+                    $target_user_id = $request->getParsedBody()['user_id'] ?? $request->getParsedBody()['owner_id'];
+                }
                 if(isset($target_user_id)) {
                     $statement = $pdo->prepare('SELECT id FROM user WHERE token = ?');
                     $statement->execute([$token]);
@@ -29,7 +36,7 @@ class AuthLevelMiddleware {
                 }
             }
         }
-        $data = ['error' => "Authorization level error. You don't have permission to use this route, or the target id is missing."];
+        $data = ['error' => "Authorization level error. You don't have permission to use this route or the object with given target id, or the target id is missing."];
         $response = new Response();
         $response->getBody()->write(json_encode($data));
         return $response
