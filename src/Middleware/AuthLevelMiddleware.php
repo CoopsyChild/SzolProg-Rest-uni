@@ -29,7 +29,7 @@ class AuthLevelMiddleware {
                 }
             }
         }
-        $data = ['error' => "Authorization level error. You don't have permission to use this route"];
+        $data = ['error' => "Authorization level error. You don't have permission to use this route, or the target id is missing."];
         $response = new Response();
         $response->getBody()->write(json_encode($data));
         return $response
