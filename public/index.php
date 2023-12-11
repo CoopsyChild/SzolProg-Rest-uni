@@ -190,6 +190,20 @@ $app->post('/drink-category', function (Request $request, Response $response) {
         ->withHeader('content-type', 'application/json')
         ->withStatus(200);
 })->add(new AuthLevelMiddleware());
+$app->delete('/drink-category', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $db = new DB();
+    $pdo = $db->connect();
+    $statement = $pdo->prepare('DELETE FROM drink_category WHERE id = ?');
+    if($statement->execute([$data['category_id']])){
+        $response->getBody()->write(json_encode('Successfuly deleted.'));
+    } else {
+        $response->getBody()->write(json_encode('Something went wrong.'));
+    }
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+})->add(new AuthLevelMiddleware());
 //endregion
 
 $app->run();
