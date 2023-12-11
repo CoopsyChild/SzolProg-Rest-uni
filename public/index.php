@@ -76,20 +76,38 @@ $app->put('/users', function (Request $request, Response $response, array $args)
     $db = new DB();
     $pdo = $db->connect();
     $statement = $pdo->prepare("UPDATE user SET username = ?, last_name = ? WHERE id = ?");
-    $statement->execute([$data['username'],$data['last_name'],$data['id']]);
+    $statement->execute([$data['username'],$data['last_name'],$data['user_id']]);
 
     $statement = $pdo->prepare("SELECT id,username,last_name FROM user WHERE id = ?");
-    $statement->execute($data['id']);
+    $statement->execute([$data['user_id']]);
     $data = $statement->fetch(PDO::FETCH_ASSOC);
     $response->getBody()->write(json_encode($data));
     return $response
         ->withHeader('content-type', 'application/json')
         ->withStatus(200);
-});
+})->add(new AuthLevelMiddleware());
 
 //endregion
 
 //region drinks endpoints
+
+$app->get('/drinks', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $db = new DB();
+    $pdo = $db->connect();
+    if($request->getAttribute('isAdmin') == 'true') {
+        $statement = $pdo->prepare("SELECT * FROM drink_stock");
+        $statement->execute();
+    } else {
+        $statement = $pdo->prepare("SELECT id,item_number,name,size,price,quantity,category_id FROM drink_stock WHERE owner_id = ?");
+        $statement->execute([$data['user_id']]);
+    }
+    $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $response->getBody()->write(json_encode($data));
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+})->add(new AuthLevelMiddleware());
 
 //endregion
 
