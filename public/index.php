@@ -175,6 +175,21 @@ $app->get('/drink-category', function (Request $request, Response $response) {
         ->withStatus(200);
 });
 
+$app->post('/drink-category', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $db = new DB();
+    $pdo = $db->connect();
+    $statement = $pdo->prepare('INSERT INTO drink_category(`name`) values (?)');
+    $statement->execute([$data['name']]);
+    $last_id=$pdo->lastInsertId();
+    $statement = $pdo->prepare('SELECT * FROM drink_category where id=?');
+    $statement->execute([$last_id]);
+    $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $response->getBody()->write(json_encode($data));
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+})->add(new AuthLevelMiddleware());
 //endregion
 
 $app->run();
