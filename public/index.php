@@ -41,7 +41,7 @@ $app->get('/users', function (Request $request, Response $response) {
         ->withStatus(401);
 })->add(new AuthLevelMiddleware());
 
-$app->post('/users/login', function (Request $request, Response $response, array $args) {
+$app->post('/users/login', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $db = new DB();
     $pdo = $db->connect();
@@ -54,7 +54,7 @@ $app->post('/users/login', function (Request $request, Response $response, array
         ->withStatus(200);
 });
 
-$app->post('/users/register', function (Request $request, Response $response, array $args) {
+$app->post('/users/register', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $db = new DB();
     $pdo = $db->connect();
@@ -71,7 +71,7 @@ $app->post('/users/register', function (Request $request, Response $response, ar
         ->withStatus(200);
 });
 
-$app->put('/users', function (Request $request, Response $response, array $args) {
+$app->put('/users', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $db = new DB();
     $pdo = $db->connect();
@@ -108,6 +108,61 @@ $app->get('/drinks', function (Request $request, Response $response) {
         ->withHeader('content-type', 'application/json')
         ->withStatus(200);
 })->add(new AuthLevelMiddleware());
+
+$app->post('/drinks', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $db = new DB();
+    $pdo = $db->connect();
+    $statement = $pdo->prepare("INSERT INTO drink_stock(`item_number`,`name`,`size`,`price`,`quantity`,`category_id`, `owner_id`) VALUES (?,?,?,?,?,?,?)");
+    $statement->execute([$data['item_number'],$data['name'],$data['size'],$data['price'],$data['quantity'],$data['category_id'],$data['owner_id']]);
+    $last_id=$pdo->lastInsertId();
+    $statement = $pdo->prepare('SELECT item_number,name,size,price,quantity,category_id FROM drink_stock where id=?');
+    $statement->execute([$last_id]);
+    $data = $statement->fetch(PDO::FETCH_ASSOC);
+    $response->getBody()->write(json_encode($data));
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+})->add(new AuthLevelMiddleware());
+
+$app->put('/drinks', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $db = new DB();
+    $pdo = $db->connect();
+    if($request->getAttribute('isAdmin') == 'true') {
+        $statement = $pdo->prepare("UPDATE drink_stock SET item_number = ?, name = ?, size = ?,price = ?,quantity = ?,category_id = ?,owner_id = ? WHERE id=?");
+        $statement->execute([$data['item_number'],$data['name'],$data['size'],$data['price'],$data['quantity'],$data['category_id'],$data['owner_id'],$data['product_id']]);
+    } else {
+        $statement = $pdo->prepare("UPDATE drink_stock SET item_number = ?, name = ?, size = ?,price = ?,quantity = ?,category_id = ? WHERE id=?");
+        $statement->execute([$data['item_number'],$data['name'],$data['size'],$data['price'],$data['quantity'],$data['category_id'],$data['product_id']]);
+    }
+    $statement = $pdo->prepare('SELECT item_number,name,size,price,quantity,category_id FROM drink_stock where id=?');
+    $statement->execute([$data['product_id']]);
+    $data = $statement->fetch(PDO::FETCH_ASSOC);
+    $response->getBody()->write(json_encode($data));
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+})->add(new AuthLevelMiddleware());
+
+$app->delete('/drinks', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $db = new DB();
+    $pdo = $db->connect();
+    $statement = $pdo->prepare('DELETE FROM drink_stock WHERE id=?');
+    if($statement->execute([$data['product_id']])){
+        $response->getBody()->write(json_encode('Successfuly deleted.'));
+    } else {
+        $response->getBody()->write(json_encode('Something went wrong.'));
+    }
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+})->add(new AuthLevelMiddleware());
+
+//endregion
+
+//region category endpoints
 
 //endregion
 
