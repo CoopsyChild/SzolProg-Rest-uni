@@ -190,6 +190,7 @@ $app->post('/drink-category', function (Request $request, Response $response) {
         ->withHeader('content-type', 'application/json')
         ->withStatus(200);
 })->add(new AuthLevelMiddleware());
+
 $app->delete('/drink-category', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $db = new DB();
@@ -204,6 +205,22 @@ $app->delete('/drink-category', function (Request $request, Response $response) 
         ->withHeader('content-type', 'application/json')
         ->withStatus(200);
 })->add(new AuthLevelMiddleware());
+
+$app->put('/drink-category', function (Request $request, Response $response) {
+    $data = $request->getParsedBody();
+    $db = new DB();
+    $pdo = $db->connect();
+    $statement = $pdo->prepare('UPDATE drink_category SET name = ?  WHERE id = ?');
+    $statement->execute([$data['name'],$data['category_id']]);
+    $statement = $pdo->prepare('SELECT * FROM drink_category WHERE id = ?');
+    $statement->execute([$data['category_id']]);
+    $data = $statement->fetch(PDO::FETCH_ASSOC);
+    $response->getBody()->write(json_encode($data));
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+})->add(new AuthLevelMiddleware());
+
 //endregion
 
 $app->run();

@@ -25,7 +25,7 @@ class AuthLevelMiddleware {
                     $target_user_id = $statement->fetch(\PDO::FETCH_ASSOC)['owner_id'];
                 }
                 else{
-                    $target_user_id = $request->getParsedBody()['user_id'] ?? $request->getParsedBody()['owner_id'];
+                    $target_user_id = $request->getParsedBody()['user_id'] ?? $request->getParsedBody()['owner_id'] ?? null;
                 }
                 if(isset($target_user_id)) {
                     $statement = $pdo->prepare('SELECT id FROM user WHERE token = ?');
