@@ -163,6 +163,17 @@ $app->delete('/drinks', function (Request $request, Response $response) {
 //endregion
 
 //region category endpoints
+$app->get('/drink-category', function (Request $request, Response $response) {
+    $db = new DB();
+    $pdo = $db->connect();
+    $statement = $pdo->prepare('SELECT * FROM drink_category');
+    $statement->execute();
+    $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $response->getBody()->write(json_encode($data));
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(200);
+});
 
 //endregion
 
