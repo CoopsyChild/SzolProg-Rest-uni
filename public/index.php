@@ -48,6 +48,12 @@ $app->post('/users/login', function (Request $request, Response $response) {
     $statement = $pdo->prepare('SELECT id,token,last_name,is_admin,registration_date FROM user where username = ? AND password = ?');
     $statement->execute([$data['username'],md5($data['password'],false)]);
     $data = $statement->fetch(PDO::FETCH_ASSOC);
+    if(!$data) {
+        $response->getBody()->write(json_encode('Wrong credentials'));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(401);
+    }
     $response->getBody()->write(json_encode($data));
     return $response
         ->withHeader('content-type', 'application/json')
@@ -92,7 +98,6 @@ $app->put('/users', function (Request $request, Response $response) {
 //region drinks endpoints
 
 $app->get('/drinks', function (Request $request, Response $response) {
-    $data = $request->getParsedBody();
     $db = new DB();
     $pdo = $db->connect();
     if($request->getAttribute('isAdmin') == 'true') {
@@ -100,7 +105,7 @@ $app->get('/drinks', function (Request $request, Response $response) {
         $statement->execute();
     } else {
         $statement = $pdo->prepare("SELECT id,item_number,name,size,price,quantity,category_id FROM drink_stock WHERE owner_id = ?");
-        $statement->execute([$data['user_id']]);
+        $statement->execute([$request->getAttribute('userId')]);
     }
     $data = $statement->fetchAll(PDO::FETCH_ASSOC);
     $response->getBody()->write(json_encode($data));

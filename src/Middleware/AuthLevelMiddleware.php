@@ -34,6 +34,10 @@ class AuthLevelMiddleware {
                         return $handler->handle($request->withAttribute('isAdmin', 'false'));
                     }
                 }
+            } else {
+                $statement = $pdo->prepare('SELECT id FROM user WHERE token = ?');
+                $statement->execute([$token]);
+                return $handler->handle($request->withAttribute('userId', $statement->fetch(\PDO::FETCH_ASSOC)['id']));
             }
         }
         $data = ['error' => "Authorization level error. You don't have permission to use this route or the object with given target id, or the target id is missing."];
