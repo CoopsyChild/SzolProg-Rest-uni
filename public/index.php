@@ -134,7 +134,7 @@ $app->put('/drinks', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $db = new DB();
     $pdo = $db->connect();
-    if($request->getAttribute('isAdmin') == 'true') {
+    if($request->getAttribute('isAdmin') == 'true' && isset($data['owner_id'])) {
         $statement = $pdo->prepare("UPDATE drink_stock SET item_number = ?, name = ?, size = ?,price = ?,quantity = ?,category_id = ?,owner_id = ? WHERE id=?");
         $statement->execute([$data['item_number'],$data['name'],$data['size'],$data['price'],$data['quantity'],$data['category_id'],$data['owner_id'],$data['product_id']]);
     } else {
