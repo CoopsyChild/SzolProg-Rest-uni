@@ -91,9 +91,16 @@ $app->put('/users', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $db = new DB();
     $pdo = $db->connect();
-    $statement = $pdo->prepare("UPDATE user SET username = ?, last_name = ? WHERE id = ?");
-    $statement->execute([$data['username'],$data['last_name'],$data['user_id']]);
-
+    if(isset($data['last_name']))
+    {
+        $statement = $pdo->prepare("UPDATE user SET last_name = ? WHERE id = ?");
+        $statement->execute([$data['last_name'],$data['user_id']]);
+    }
+    if(isset($data['password']))
+    {
+        $statement = $pdo->prepare("UPDATE user SET passwword = ? WHERE id = ?");
+        $statement->execute([md5($data['password']),$data['user_id']]);
+    }
     $statement = $pdo->prepare("SELECT id,username,last_name FROM user WHERE id = ?");
     $statement->execute([$data['user_id']]);
     $data = $statement->fetch(PDO::FETCH_ASSOC);
