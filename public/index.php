@@ -64,17 +64,27 @@ $app->post('/users/register', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $db = new DB();
     $pdo = $db->connect();
-    $statement = $pdo->prepare("INSERT INTO user(`username`,`password`,`last_name`,`token`,`is_admin`) VALUES (?,?,?,?,0)");
-    $token = TokenCreator::generateToken();
-    $statement->execute([$data['username'],md5($data['password']),$data['last_name'],$token]);
-    $last_id=$pdo->lastInsertId();
-    $statement = $pdo->prepare('SELECT id,username,last_name,is_admin,registration_date FROM user where id=?');
-    $statement->execute([$last_id]);
-    $data = $statement->fetch(PDO::FETCH_ASSOC);
-    $response->getBody()->write(json_encode($data));
-    return $response
-        ->withHeader('content-type', 'application/json')
-        ->withStatus(200);
+    $statement = $pdo->prepare('SELECT id FROM user where username LIKE ?');
+    $statement->execute([$data['username']]);
+    if(!$statement->fetch(PDO::FETCH_ASSOC)) {
+        $statement = $pdo->prepare("INSERT INTO user(`username`,`password`,`last_name`,`token`,`is_admin`) VALUES (?,?,?,?,0)");
+        $token = TokenCreator::generateToken();
+        $statement->execute([$data['username'], md5($data['password']), $data['last_name'], $token]);
+        $last_id = $pdo->lastInsertId();
+        $statement = $pdo->prepare('SELECT id,username,last_name,is_admin,registration_date FROM user where id=?');
+        $statement->execute([$last_id]);
+        $data = $statement->fetch(PDO::FETCH_ASSOC);
+        $response->getBody()->write(json_encode($data));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(200);
+    }
+    else{
+        $response->getBody()->write(json_encode('User with this username already exits'));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(400);
+    }
 });
 
 $app->put('/users', function (Request $request, Response $response) {
