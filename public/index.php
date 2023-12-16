@@ -98,7 +98,7 @@ $app->put('/users', function (Request $request, Response $response) {
     }
     if(isset($data['password']))
     {
-        $statement = $pdo->prepare("UPDATE user SET passwword = ? WHERE id = ?");
+        $statement = $pdo->prepare("UPDATE user SET password = ? WHERE id = ?");
         $statement->execute([md5($data['password']),$data['user_id']]);
     }
     $statement = $pdo->prepare("SELECT id,username,last_name FROM user WHERE id = ?");
